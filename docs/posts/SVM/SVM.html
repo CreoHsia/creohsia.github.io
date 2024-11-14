@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Creo Hsia">
+<meta name="dcterms.date" content="2024-11-14">
+<meta name="description" content="SVM study record">
+
+<title>Support Vector Machines – Home</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../style.css">
+<meta property="og:title" content="Support Vector Machines – Home">
+<meta property="og:description" content="SVM study record">
+<meta property="og:site_name" content="Home">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <div id="quarto-announcement" data-announcement-id="8fa1f43789cf7460423f965f48bbcf1d" class="alert alert-primary hidden"><i class="bi bi-info-circle quarto-announcement-icon"></i><div class="quarto-announcement-content">
+<p><strong>Alert</strong> - You are welcome to use any <a href="https://github.com/CreoHsia/quarto-template">template</a>, but please do not use my posts.</p>
+</div><i class="bi bi-x-lg quarto-announcement-action"></i></div>
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Home</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../resource/resource.html"> 
+<span class="menu-text">Resource</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://x.com/CreoHAHAHA"> <i class="bi bi-twitter" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/CreoHsia"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:creoxjz@gmail.com"> <i class="bi bi-envelope" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Support Vector Machines</h1>
+                  <div>
+        <div class="description">
+          SVM study record
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Statistics Estimation</div>
+                <div class="quarto-category">Optimization</div>
+                <div class="quarto-category">MLE</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Creo Hsia </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">November 14, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#margins" id="toc-margins" class="nav-link active" data-scroll-target="#margins"><span class="header-section-number">1</span> Margins</a></li>
+  <li><a href="#notation" id="toc-notation" class="nav-link" data-scroll-target="#notation"><span class="header-section-number">2</span> Notation</a></li>
+  <li><a href="#functional-and-geometric-margins" id="toc-functional-and-geometric-margins" class="nav-link" data-scroll-target="#functional-and-geometric-margins"><span class="header-section-number">3</span> Functional and Geometric Margins</a>
+  <ul class="collapse">
+  <li><a href="#functional-margins" id="toc-functional-margins" class="nav-link" data-scroll-target="#functional-margins"><span class="header-section-number">3.1</span> Functional Margins</a></li>
+  <li><a href="#geometric-margins" id="toc-geometric-margins" class="nav-link" data-scroll-target="#geometric-margins"><span class="header-section-number">3.2</span> Geometric Margins</a></li>
+  </ul></li>
+  <li><a href="#the-optimal-margin-classifier" id="toc-the-optimal-margin-classifier" class="nav-link" data-scroll-target="#the-optimal-margin-classifier"><span class="header-section-number">4</span> The Optimal Margin Classifier</a></li>
+  <li><a href="#lagrange-duality" id="toc-lagrange-duality" class="nav-link" data-scroll-target="#lagrange-duality"><span class="header-section-number">5</span> Lagrange Duality</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+
+<section id="margins" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="margins"><span class="header-section-number">1</span> Margins</h2>
+<p>Consider our logistic regression model, where the probability <span class="math inline">\(p(y=1|x;\theta)\)</span> is modeled by <span class="math inline">\(g(\theta^T x)\)</span>. We predict “1” on an input <span class="math inline">\(x\)</span> iff <span class="math inline">\(\theta^Tx\geq0\)</span>. That means <strong>the larger <span class="math inline">\(\theta^T x\)</span> is, the larger also is <span class="math inline">\(p(y=1|x;w,b)\)</span>.</strong></p>
+<p>Thus, informally, we can think of our prediction as being a very confident one that <span class="math inline">\(y=1\)</span> if <span class="math inline">\(\theta^T x &gt;&gt;0\)</span>. Similarly, we think of logistic regression as making a very confident prediction of <span class="math inline">\(y=0\)</span>, if <span class="math inline">\(\theta^Tx&lt;&lt;0\)</span>.</p>
+<p>Again, informally, it seems that we’d found a good fit for the training data if we can find <span class="math inline">\(\theta\)</span> so that <span class="math inline">\(\theta x^{(i)}&gt;&gt;0\)</span> whenever <span class="math inline">\(y^{(i)}=1\)</span>, and <span class="math inline">\(\theta^T x^{(i)}&lt;&lt;0\)</span> whenever <span class="math inline">\(y^{(i)}=0\)</span>, since this would <strong>reflect a very confident (and correct) set of classifications for all the training examples</strong>.</p>
+<blockquote class="blockquote">
+<p>Again, informally, it’d be nice if, given a training set, we could find a <strong>decision boundary</strong> that allows us to <strong>make all correct and confident (meaning far from the decision boundary) predictions on the training examples.</strong></p>
+</blockquote>
+</section>
+<section id="notation" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="notation"><span class="header-section-number">2</span> Notation</h2>
+<p>We will consider a <strong>linear classifier</strong> for a <strong>binary classification</strong> problem with labels <span class="math inline">\(y\)</span> and features <span class="math inline">\(x\)</span>.</p>
+<p>From now on, we’ll use <span class="math inline">\(y \in \{−1, 1\}\)</span> (instead of <span class="math inline">\(\{0, 1\}\)</span>) to denote the class labels. We will use parameters <span class="math inline">\(w,b\)</span> and write our classifier as <span class="math display">\[
+h_{w, b}(x)=g\left(w^T x+b\right) .
+\]</span> Here, <span class="math inline">\(g(z)=1\)</span> if <span class="math inline">\(z \geq 0\)</span>, and <span class="math inline">\(g(z)=-1\)</span> otherwise.</p>
+<blockquote class="blockquote">
+<p>This “<span class="math inline">\(w,b\)</span>” notation allows us to explicitly <strong>treat the intercept term</strong> <span class="math inline">\(b\)</span> <strong>separately</strong> from the other parameters.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Our classifier will <strong>directly predict either <span class="math inline">\(1\)</span> or <span class="math inline">\(−1\)</span></strong> , without first going through the intermediate step of estimating the probability of <span class="math inline">\(y\)</span> being <span class="math inline">\(1\)</span> (which was what logistic regression did).</p>
+</blockquote>
+</section>
+<section id="functional-and-geometric-margins" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="functional-and-geometric-margins"><span class="header-section-number">3</span> Functional and Geometric Margins</h2>
+<section id="functional-margins" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="functional-margins"><span class="header-section-number">3.1</span> Functional Margins</h3>
+<p><strong>Functional Margin Definition:</strong></p>
+<p>For a training example <span class="math inline">\((x^{(i)}, y^{(i)})\)</span>, the <strong>functional margin</strong> with respect to a set of parameters <span class="math inline">\((w, b)\)</span> is defined as: <span class="math display">\[
+\hat{\gamma}^{(i)}=y^{(i)}\left(w^T x^{(i)}+b\right)
+\]</span></p>
+<blockquote class="blockquote">
+<p>This value essentially measures <strong>how confident the model is</strong> in predicting that a given training example is correctly classified.</p>
+</blockquote>
+<p><strong>Interpretation of Functional Margin</strong>:</p>
+<ul>
+<li>If <span class="math inline">\(y^{(i)} = 1\)</span> , for the functional margin to be large (indicating confidence in the prediction), <span class="math inline">\(w^T x^{(i)} + b\)</span> needs to be a large positive number.</li>
+<li>If <span class="math inline">\(y^{(i)} = -1\)</span> , for the functional margin to be large, <span class="math inline">\(w^T x^{(i)} + b\)</span> should be a large negative number.</li>
+<li>If the product <span class="math inline">\(y^{(i)} (w^T x^{(i)} + b) &gt; 0\)</span> , it means that the model’s prediction is correct</li>
+</ul>
+<blockquote class="blockquote">
+<ul>
+<li>A large functional margin indicates that the model is confidently and correctly classifying the example.</li>
+<li>It helps in assessing not just <strong>whether the model makes a correct prediction</strong>, but also <strong>how confident it is about that prediction</strong>.</li>
+</ul>
+</blockquote>
+<p><strong><em><u>There’s one property of the functional margin that makes it not a very good measure of confidence:</u></em></strong></p>
+<ul>
+<li>The classifier function <span class="math inline">\(g\)</span> (used in predicting <span class="math inline">\(\pm 1\)</span> ) <strong>depends on the sign</strong> of <span class="math inline">\(w^T x + b\)</span> but <strong>not on its magnitude</strong>.</li>
+<li><strong>scaling</strong> <span class="math inline">\(w\)</span> and <span class="math inline">\(b\)</span> (e.g., multiplying them by <span class="math inline">\(2\)</span>) does <strong>not change the decision boundary</strong>, as the sign of <span class="math inline">\(w^T x + b\)</span> remains the same.</li>
+<li>Hence, we can make the functional margin as large as we want <strong>without changing the underlying classification.</strong> (if we scale the parameter, also the functional margin will be scaled) Therefore, the functional margin is <strong>not a reliable measure of confidence</strong> on its own.</li>
+</ul>
+<p><strong><em><u>Solution: Normalization</u></em></strong></p>
+<ul>
+<li>By <strong>normalizing</strong> <span class="math inline">\(w\)</span> and <span class="math inline">\(b\)</span> (i.e., considering <span class="math inline">\((w / ||w||_2, b / ||w||_2)\)</span> ), the functional margin becomes a <strong>more meaningful</strong> measure because it restricts <span class="math inline">\(w\)</span> and <span class="math inline">\(b\)</span> from being scaled arbitrarily.</li>
+</ul>
+<p>Given a training set <span class="math inline">\(S=\left\{\left(x^{(i)}, y^{(i)}\right) ; i=1, \ldots, m\right\}\)</span> we also define the function margin of (<span class="math inline">\(w,b\)</span>) with respect to <span class="math inline">\(S\)</span> to be the <strong>smallest of the functional margins</strong> of the individual training examples, denoted by <span class="math inline">\(\hat{\gamma}\)</span>. <span class="math display">\[
+\hat{\gamma}=\min _{i=1, \ldots, m} \hat{\gamma}^{(i)}
+\]</span></p>
+</section>
+<section id="geometric-margins" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="geometric-margins"><span class="header-section-number">3.2</span> Geometric Margins</h3>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="geometric margin.png" class="img-fluid figure-img"></p>
+<figcaption>Geomeric margrgin</figcaption>
+</figure>
+</div>
+<p>The decision boundary corresponding to <span class="math inline">\((w,b)\)</span> is shown, along with the vector <span class="math inline">\(w\)</span>. Note that <span class="math inline">\(w\)</span> is <strong>orthogonal to the separating hyperplane</strong>.</p>
+<p>Consider the point at <span class="math inline">\(A\)</span>. Its distance to the decision boundary, <span class="math inline">\(\gamma(i)\)</span>, is given by the line segment <span class="math inline">\(AB\)</span>.</p>
+<p><span class="math inline">\(w /\|w\|\)</span> is a unit-length vector pointing in the same direction as <span class="math inline">\(w\)</span>. Since <span class="math inline">\(A\)</span> represents <span class="math inline">\(x^{(i)}\)</span>, we therefore find that point <span class="math inline">\(B\)</span> is given by <span class="math inline">\(x^{(i)}-\gamma^{(i)} \cdot w /\|w\|\)</span>. Since <span class="math inline">\(B\)</span> is on the boundary so <span class="math inline">\(B\)</span> satisfy the equation <span class="math inline">\(w^Tx+b=0\)</span>. Hence, <span class="math display">\[
+w^T\left(x^{(i)}-\gamma^{(i)} \frac{w}{\|w\|}\right)+b=0
+\]</span> Solving for <span class="math inline">\(\gamma(i)\)</span> yields <span class="math display">\[
+\gamma^{(i)}=\frac{w^T x^{(i)}+b}{\|w\|}=\left(\frac{w}{\|w\|}\right)^T x^{(i)}+\frac{b}{\|w\|} .
+\]</span> More generally, we define the <strong>geometric margin</strong> of <span class="math inline">\((w, b)\)</span> with respect to a training example <span class="math inline">\(\left(x^{(i)}, y^{(i)}\right)\)</span> to be</p>
+<p><span class="math display">\[
+\gamma^{(i)}=y^{(i)}\left(\left(\frac{w}{\|w\|}\right)^T x^{(i)}+\frac{b}{\|w\|}\right) .
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\gamma(i)&gt;0\)</span> if the model’s prediction is correct</li>
+<li>if <span class="math inline">\(\|w\|=1\)</span>, then the <strong>functional margin equals the geometric margin</strong></li>
+<li>the geometric margin is <strong>invariant to rescaling</strong> of the parameters</li>
+<li>This invariance allows us to impose any <strong>arbitrary scaling constraint</strong> on <span class="math inline">\(w\)</span> without affecting the model’s performance or decision boundary. When fitting w and b to training data, we can choose constraints such as:
+<ul>
+<li><span class="math inline">\(||w|| = 1\)</span> (normalizing <span class="math inline">\(w\)</span> to have a unit norm)</li>
+<li><span class="math inline">\(|w_1|\)</span> = 5</li>
+<li><span class="math inline">\(|w_1 + b| + |w_2| = 2\)</span></li>
+</ul></li>
+<li>These constraints can be satisfied by <strong>rescaling</strong> <span class="math inline">\(w\)</span> and <span class="math inline">\(b\)</span> .</li>
+</ul>
+<p>Finally, given a training set <span class="math inline">\(S=\left\{\left(x^{(i)}, y^{(i)}\right) ; i=1, \ldots, m\right\}\)</span>, we also define the geometric margin of <span class="math inline">\((w, b)\)</span> with respect to <span class="math inline">\(S\)</span> to be the <strong>smallest of the geometric margins</strong> on the individual training examples:</p>
+<p><span class="math display">\[
+\gamma=\min _{i=1, \ldots, m} \gamma^{(i)}
+\]</span></p>
+</section>
+</section>
+<section id="the-optimal-margin-classifier" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-optimal-margin-classifier"><span class="header-section-number">4</span> The Optimal Margin Classifier</h2>
+<p>From our previous discussion, it is natural to find a decision boundary that <strong>maximizes the (geometric) margin</strong>, since this would reflect a very <strong>confident set of predictions</strong> on the training set and a <strong>good “fit” to the training data</strong>.</p>
+<p>Specifically, this will result in a classifier that separates the positive and the negative training examples with a “gap” (geometric margin).</p>
+<p>We assume that we are given a training set that is <strong>linearly separable</strong>; i.e., that it is possible to <strong>separate</strong> the positive and negative examples <strong>using some separating hyperplane.</strong></p>
+<p>How we we find the one that achieves the maximum geometric margin? We can pose the following optimization problem: <span class="math display">\[
+\begin{aligned}
+\max _{\gamma, w, b} &amp; \gamma \\
+\text { s.t. } &amp; y^{(i)}\left(w^T x^{(i)}+b\right) \geq \gamma, \quad i=1, \ldots, m \\
+&amp; \|w\|=1
+\end{aligned}
+\]</span> we want to maximize <span class="math inline">\(\gamma\)</span>, subject to each training example having geometric margin at least <span class="math inline">\(\gamma\)</span>.</p>
+<blockquote class="blockquote">
+<p>The <span class="math inline">\(||w|| = 1\)</span> constraint moreover ensures that the functional margin equals to the geometric margin</p>
+</blockquote>
+<p>But the <span class="math inline">\(||w|| = 1\)</span> constraint is a nasty (non-convex) one. We transform the problem into: <span class="math display">\[
+\begin{aligned}
+\max _{\gamma, w, b} &amp; \frac{\hat{\gamma}}{\|w\|} \\
+\text { s.t. } &amp; y^{(i)}\left(w^T x^{(i)}+b\right) \geq \hat{\gamma}, \quad i=1, \ldots, m
+\end{aligned}
+\]</span> Here <span class="math inline">\(\gamma=\hat{\gamma} /||w|\)</span> using the relation of geometric and functional margins. Recall that we can add an arbitrary <strong>scaling constraint</strong> on $w $ and <span class="math inline">\(b\)</span> without changing anything (of geometic margins ). We can let <span class="math inline">\(\hat{\gamma}=1\)</span>.</p>
+<p>Plugging this into our problem above and noting that maximizing <span class="math inline">\(\hat{\gamma} /\|w\|=1 /\|w\|\)</span> is the same thing as minimizing <span class="math inline">\(\|w\|^2\)</span>, we now have the following optimization problem:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\min _{\gamma, w, b} &amp; \frac{1}{2}\|w\|^2 \\
+\text { s.t. } &amp; y^{(i)}\left(w^T x^{(i)}+b\right) \geq 1, \quad i=1, \ldots, m
+\end{aligned}
+\]</span></p>
+</section>
+<section id="lagrange-duality" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="lagrange-duality"><span class="header-section-number">5</span> Lagrange Duality</h2>
+<p>Consider a problem of the following form:</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/creohsia\.github\.io\/myblog");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+<p>Made with 💜 and <a href="https://quarto.org/">Quarto</a></p>
+</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://x.com/CreoHAHAHA">
+      <i class="bi bi-twitter" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/CreoHsia">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+    <li class="nav-item compact">
+    <a class="nav-link" href="mailto:creoxjz@gmail.com">
+      <i class="bi bi-envelope" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+</body></html>

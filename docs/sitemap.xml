@@ -2,26 +2,42 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://creohsia.github.io/myblog/blog.html</loc>
-    <lastmod>2024-10-16T10:15:54.455Z</lastmod>
+    <lastmod>2024-10-23T05:53:56.306Z</lastmod>
   </url>
   <url>
     <loc>https://creohsia.github.io/myblog/index.html</loc>
-    <lastmod>2024-10-17T08:28:03.857Z</lastmod>
-  </url>
-  <url>
-    <loc>https://creohsia.github.io/myblog/posts/Naive bayes model/Naive bayes model.html</loc>
-    <lastmod>2024-10-17T02:29:30.420Z</lastmod>
-  </url>
-  <url>
-    <loc>https://creohsia.github.io/myblog/posts/Rcpp study/Rcpp study.html</loc>
-    <lastmod>2024-10-17T15:39:34.535Z</lastmod>
+    <lastmod>2024-10-23T05:53:56.328Z</lastmod>
   </url>
   <url>
     <loc>https://creohsia.github.io/myblog/posts/ROC and AUC/ROC and AUC.html</loc>
-    <lastmod>2024-10-17T15:58:51.300Z</lastmod>
+    <lastmod>2024-10-23T05:53:56.346Z</lastmod>
+  </url>
+  <url>
+    <loc>https://creohsia.github.io/myblog/posts/Naive bayes model/Naive bayes model.html</loc>
+    <lastmod>2024-10-23T05:53:56.329Z</lastmod>
+  </url>
+  <url>
+    <loc>https://creohsia.github.io/myblog/posts/Rcpp study/Rcpp study.html</loc>
+    <lastmod>2024-10-23T05:53:56.349Z</lastmod>
+  </url>
+  <url>
+    <loc>https://creohsia.github.io/myblog/posts/Generative learning algorithms/Generative learning algorithms.html</loc>
+    <lastmod>2024-11-14T07:45:29.311Z</lastmod>
+  </url>
+  <url>
+    <loc>https://creohsia.github.io/myblog/posts/Optimization theory Fianl project/optimization theory.html</loc>
+    <lastmod>2024-11-14T07:36:38.291Z</lastmod>
+  </url>
+  <url>
+    <loc>https://creohsia.github.io/myblog/posts/SVM/SVM.html</loc>
+    <lastmod>2024-11-14T07:48:48.631Z</lastmod>
+  </url>
+  <url>
+    <loc>https://creohsia.github.io/myblog/posts/GLM/GLM.html</loc>
+    <lastmod>2024-11-14T07:45:52.539Z</lastmod>
   </url>
   <url>
     <loc>https://creohsia.github.io/myblog/resource/resource.html</loc>
-    <lastmod>2024-10-23T05:46:21.690Z</lastmod>
+    <lastmod>2024-10-23T05:53:56.358Z</lastmod>
   </url>
 </urlset>

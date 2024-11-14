@@ -3,6 +3,10 @@
     "listing": "/blog.html",
     "items": [
       "/posts/ROC and AUC/ROC and AUC.html",
+      "/posts/Generative learning algorithms/Generative learning algorithms.html",
+      "/posts/Optimization theory Fianl project/optimization theory.html",
+      "/posts/SVM/SVM.html",
+      "/posts/GLM/GLM.html",
       "/posts/Naive bayes model/Naive bayes model.html",
       "/posts/Rcpp study/Rcpp study.html"
     ]

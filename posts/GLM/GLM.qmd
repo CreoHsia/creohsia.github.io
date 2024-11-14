@@ -1,0 +1,165 @@
+---
+title: "GLM"
+author: "Creo Hsia"
+date: "2024-11-14"
+description: "Generative learning algorithms study record"
+categories: [Statistics Estimation, Optimization, MLE]
+format: 
+  html:
+    highlight-style: ayu
+    code-fold: true
+    code-copy: true 
+    code-overflow: 'scroll'
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    editor: visual
+knitr:
+  opts_chunk: 
+    fig.path: "image/"
+    collapse: true
+    comment: "#>|"
+---
+
+## The exponential family
+
+We say that a class of distributions is in the exponential family if it can be written in the form:
+$$
+p(y ; \eta)=b(y) \exp \left(\eta^T T(y)-a(\eta)\right)
+$$
+
++ $\eta$ : the natural parameter (also called the canonical parameter)
++ $T(y)$: sufficient statistic (for the distributions we consider)
++ $a(\eta)$: log partition function. The quantity $e^{-a(\eta)}$ essentially plays the role of a normalization constant
+
+Bernoulli distribution is a members of exponential family, since we can write the Bernoulli distribution as: 
+$$
+\begin{aligned}
+p(y ; \phi) & =\phi^y(1-\phi)^{1-y} \\
+& =\exp (y \log \phi+(1-y) \log (1-\phi)) \\
+& =\exp \left(\left(\log \left(\frac{\phi}{1-\phi}\right)\right) y+\log (1-\phi)\right)
+\end{aligned}
+$$
+Then the natural parameter is given by $\eta=\log (\phi /(1-\phi))$. **The inverse is the familiar sigmoid function**!
+
+## Constructing GLMs
+
+Consider a classification or regression problem where we would like to predict the value of some random variable $y$ as a function of $x$. To derive a GLM for this problem, we will make the following three assumptions about the conditional distribution of $y$ given $x$ and about our model:
+
+1. $y \mid x ; \theta \sim \operatorname{ExponentialFamily}(\eta)$. I.e., given $x$ and $\theta$, the distribution of $y$ follows some exponential family distribution, with parameter $\eta$.
+2. Given $x$, our goal is to predict the expected value of $T(y)$ given $x$. 
+3. The natural parameter $\eta$ and the inputs $x$ are related linearly: $\eta=\theta^T x$. (Or, if $\eta$ is vector-valued, then $\eta_i=\theta_i^T x$.)
+
+Now we show that logistic regression is a member of GLMs. Note that if $y|x;\theta \sim \text{Bernouli}(\phi)$, then $Ey|x;\theta=\phi$. So
+$$
+\begin{aligned}
+h_\theta(x) & =E[y \mid x ; \theta]  \\
+& =\phi (\text{ by Bernoulli assumption})\\
+& =1 /\left(1+e^{-\eta}\right) (\text{ by exponential familay})\\
+& =1 /\left(1+e^{-\theta^T x}\right) (\text{ by assumption 3})
+\end{aligned}
+$$
+
+> Once we assume that $y$ conditioned on $x$ is Bernoulli, logistic regression arises as a consequence of the definition of GLMs and exponential family distributions.
+
+Often, $\mathrm{E}[T(y) ; \eta]$ is a function of $\eta$ (denoted by $g(\eta)$). We call it the **canoniucal response function**. Its inverse, $g^{-1}$, is called the canonical link function.
+
+Consider a classification problem in which the response variable $y$ can take on any one of $k$ values. The response variable is still **discrete**, but can now take on **more than two values**. We will thus model it as distributed according to a **multinomial distribution**.
+
+To do so, we will begin by **expressing the multinomial as an exponential family distribution**.
+
+To parameterize a multinomial over $k$ possible outcomes, we can parameterize the multinomial with only $k-1$ parameters, $\phi_1, \ldots, \phi_{k-1}$, where $\phi_i=p(y=i ; \phi)$, and $p(y=k ; \phi)=1-\sum_{i=1}^{k-1} \phi_i$. 
+
+Now define 
+$$
+T(1)=\left[\begin{array}{c}
+1 \\
+0 \\
+0 \\
+\vdots \\
+0
+\end{array}\right], T(2)=\left[\begin{array}{c}
+0 \\
+1 \\
+0 \\
+\vdots \\
+0
+\end{array}\right], T(3)=\left[\begin{array}{c}
+0 \\
+0 \\
+1 \\
+\vdots \\
+0
+\end{array}\right], \cdots, T(k-1)=\left[\begin{array}{c}
+0 \\
+0 \\
+0 \\
+\vdots \\
+1
+\end{array}\right], T(k)=\left[\begin{array}{c}
+0 \\
+0 \\
+0 \\
+\vdots \\
+0
+\end{array}\right],
+$$
+We are now ready to show that the multinomial is a member of the exponential family. We have 
+$$
+\begin{aligned}
+p(y ; \phi)= & \phi_1^{1\{y=1\}} \phi_2^{1\{y=2\}} \cdots \phi_k^{1\{y=k\}} \\
+= & \phi_1^{1\{y=1\}} \phi_2^{1\{y=2\}} \cdots \phi_k^{1-\sum_{i=1}^{k-1} 1\{y=i\}} \\
+= & \phi_1^{(T(y))_1} \phi_2^{(T(y))_2} \cdots \phi_k^{1-\sum_{i=1}^{k-1}(T(y))_i} \\
+= & \exp \left((T(y))_1 \log \left(\phi_1\right)+(T(y))_2 \log \left(\phi_2\right)+\right. \\
+& \left.\quad \cdots+\left(1-\sum_{i=1}^{k-1}(T(y))_i\right) \log \left(\phi_k\right)\right) \\
+= & \exp \left((T(y))_1 \log \left(\phi_1 / \phi_k\right)+(T(y))_2 \log \left(\phi_2 / \phi_k\right)+\right. \\
+& \left.\quad \cdots+(T(y))_{k-1} \log \left(\phi_{k-1} / \phi_k\right)+\log \left(\phi_k\right)\right) \\
+= & b(y) \exp \left(\eta^T T(y)-a(\eta)\right)
+\end{aligned}
+$$
+Where,
+$$
+\begin{aligned}
+\eta & =\left[\begin{array}{c}
+\log \left(\phi_1 / \phi_k\right) \\
+\log \left(\phi_2 / \phi_k\right) \\
+\vdots \\
+\log \left(\phi_{k-1} / \phi_k\right)
+\end{array}\right] \\
+a(\eta) & =-\log \left(\phi_k\right) \\
+b(y) & =1
+\end{aligned}
+$$
+Note that $E T_i = \phi_i=\phi_k e^{\eta_i}$, hence the link function is given by 
+$$
+\eta_i=\log \frac{\phi_i}{\phi_k}
+$$
+Define $\eta_k=0$, we have that
+$$
+1=\sum_{i=1}^k\phi_i=\sum_{i=1}^k\phi_ke^{\eta_i}
+$$
+Hence $\phi_k=1 / \sum_{i=1}^k e^{\eta_i}$, further
+$$
+\phi_i=\frac{e^{\eta_i}}{\sum_{j=1}^k e^{\eta_j}}
+$$
+By assumption 3, $\eta_i$'s are linearly related to the $x$'s. Hence, our model assumes that the conditional distribution of $y$ given $x$ is given by
+$$
+\begin{aligned}
+p(y=i \mid x ; \theta) & =\phi_i \\
+& =\frac{e^{\eta_i}}{\sum_{j=1}^k e^{\eta_j}} \\
+& =\frac{e^{\theta_i^T x}}{\sum_{j=1}^k e^{\theta_j^T x}}
+\end{aligned}
+$$
+
+> Here we define $\theta_k=0$. Our model will output the estimated probability that $p(y=i \mid x ; \theta)$
+
+
+
+Now we consider the parameter fitting. We would begin by writing down the log-likelihood
+$$
+\begin{aligned}
+\ell(\theta) & =\sum_{i=1}^n \log p\left(y^{(i)} \mid x^{(i)} ; \theta\right) \\
+& =\sum_{i=1}^n \log \prod_{l=1}^k\left(\frac{e^{\theta_l^T x^{(i)}}}{\sum_{j=1}^k e^{\theta_j^T x^{(i)}}}\right)^{1\left\{y^{(i)}=l\right\}}
+\end{aligned}
+$$
+We can now obtain the maximum likelihood estimate of the parameters by maximizing $\ell(\theta)$ in terms of θ, using a method such as gradient ascent or Newton's method.
