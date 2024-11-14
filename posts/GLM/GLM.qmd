@@ -2,7 +2,7 @@
 title: "GLM"
 author: "Creo Hsia"
 date: "2024-11-14"
-description: "Generative learning algorithms study record"
+description: "GLM study record"
 categories: [Statistics Estimation, Optimization, MLE]
 format: 
   html:
